@@ -1,4 +1,5 @@
 const ELEMENT_DATA = new WeakMap();
+const HIDESHOW_ELEMENT_DATA = new WeakMap();
 
 class qFrameCollection {
 
@@ -14,6 +15,8 @@ class qFrameCollection {
         if(something instanceof NodeList) return something[0];
 
     }
+
+    static HIDESHOW = Symbol("HIDESHOW");
 
     static isNorm(something){
         return something !== null && something !== undefined;
@@ -69,6 +72,18 @@ class qFrameCollection {
     }
     sort(fn){
         return new qFrameCollection(this.original.sort(fn));
+    }
+    slice(start, end){
+        return new qFrameCollection(this.original.slice(start, end));
+    }
+    findIndex(predicate, thisArgs){
+        return this.original.findIndex(predicate, thisArgs);
+    }
+
+
+
+    q(selector){
+        return new qFrameCollection(this[0].querySelectorAll(selector));
     }
 
 
@@ -197,7 +212,7 @@ class qFrameCollection {
     next(){
         return this.nextElementSibling;
     }
-    previous(){
+    prev(){
         return this.previousElementSibling;
     }
     last(){
@@ -242,6 +257,69 @@ class qFrameCollection {
         }
         return this;
     }
+    animate(styleObject, time) {
+        for(let el of this.original){
+            clearTimeout(HIDESHOW_ELEMENT_DATA.get(el));
+
+            let trans = el.style.transition;
+
+            HIDESHOW_ELEMENT_DATA.set(el, setTimeout( () => {
+                el.style.transition = trans;
+            }, time));
+
+            el.style.transition = `all ${time}ms`;
+            for(let key in styleObject){
+                el.style[key] = styleObject[key];
+            }
+        }
+        this.ready = new Promise( res => {
+            setTimeout( () => {
+                res(this);
+            }, time);
+        });
+        return this;
+    }
+    hide(ms){
+        this.each( e => {
+            clearTimeout(HIDESHOW_ELEMENT_DATA.get(e));
+
+            q(e).animate({
+                opacity: 0
+            }, ms);
+
+
+            HIDESHOW_ELEMENT_DATA.set(e, setTimeout( () => {
+                e.hidden = true;
+            }, ms));
+        });
+
+        this.ready = new Promise( res => {
+            setTimeout( () => {
+                res(this);
+            }, ms);
+        });
+
+        return this;
+    }
+    show(ms){
+        this.each( e => {
+            clearTimeout(HIDESHOW_ELEMENT_DATA.get(e));
+            e.hidden = false;
+            e.style.opacity = "0";
+            setTimeout(()=>{
+                e.style.transition = `opacity ${ms}ms`;
+                e.style.opacity = "1";
+            }, 0);
+        });
+
+        this.ready = new Promise( res => {
+            setTimeout( () => {
+                res(this);
+            }, ms);
+        });
+
+        return this;
+    }
 
 
     appendTo(element){
@@ -255,6 +333,11 @@ class qFrameCollection {
 
     parent(){
         return this[0].parentElement;
+    }
+
+
+    clone(deep){
+        return new qFrameCollection(this.original.cloneNode(deep));
     }
 
 
