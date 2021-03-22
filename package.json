@@ -1,0 +1,21 @@
+{
+  "name": "pish",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack -p",
+    "watch": "webpack --watch",
+    "serve": "serve ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.27.1",
+    "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "serve": "^11.3.2"
+  }
+}
