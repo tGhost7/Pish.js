@@ -4,7 +4,7 @@ import { qFrameCollection } from "./qFrameCollection.js";
 function q(selector){
     return new qFrameCollection(selector);
 }
-
+// prefix q or qFrame
 // q("div") -> qFrameCollection
 // q(document.querySelectorAll("div")) -> qFrameCollection
 // q("div").original -> original Array/nodeList
@@ -15,6 +15,13 @@ function q(selector){
 
 
 
+
+
+
+
+
+let qFrame = q;
 export {
-    q
+    q,
+    qFrame
 }
