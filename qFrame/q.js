@@ -11,7 +11,7 @@ function q(selector){
 // q("div").each(function(a,b,c){}) a:HTMLElement, b:index, c:original Array -> q("div")
 // q("div").text("hah") if arg !== null and undefined change text all divs --- else return first textContent
 // q("div"). on/off --- add/remove eventListeners
-// q("div").eq(number) -> choosed qFrameCollection
+// q("div").eq(number) -> choose qFrameCollection
 
 
 

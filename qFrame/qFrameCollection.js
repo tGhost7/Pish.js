@@ -15,12 +15,16 @@ class qFrameCollection {
             document.querySelectorAll(selector).forEach( (e,i) => this[i] = e);
         }
     }
+
+
     get original(){
         return Object.values(this).filter( e => e instanceof Element);
     }
     get length(){
         return Object.keys(this).filter( e => !Number.isNaN(+e) ).length;
     }
+
+
     each(fn){
         let i = 0;
         let original = this.original;
@@ -32,10 +36,10 @@ class qFrameCollection {
     }
     text(text){
         if(text !== undefined && text !== null){
-           for(let el of this.original){
-               el.textContent = text;
-           }
-           return this;
+            for(let el of this.original){
+                el.textContent = text;
+            }
+            return this;
         }
         return this[0].textContent;
     }
@@ -54,6 +58,45 @@ class qFrameCollection {
     eq(index){
         if(index < 0) index += this.length;
         return new qFrameCollection(this[index]);
+    }
+
+
+    addClass(...classNames){
+        for(let el of this.original){
+            el.classList.add(classNames);
+        }
+        return this;
+    }
+    removeClass(...classNames){
+        for(let el of this.original){
+            el.classList.remove(classNames);
+        }
+        return this;
+    }
+    hasClass(className){
+        return this.original.classList.inclides(className);
+    }
+    toggleClass(...classNames){
+        for(let el of this.original){
+            classNames.forEach( e =>{
+                el.toggleClass(e);
+            });
+        }
+        return this;
+    }
+
+
+    next(){
+        return this.nextElementSibling;
+    }
+    previous(){
+        return this.previousElementSibling;
+    }
+    last(){
+        return new qFrameCollection(this[this.length - 1]);
+    }
+    first(){
+        return new qFrameCollection(this[0]);
     }
 }
 export {
