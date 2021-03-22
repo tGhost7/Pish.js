@@ -88,19 +88,25 @@ class qFrameCollection {
 
 
     Ohtml(outerHTMLText){
-        for(let el of this.original){
-            el.outerHTML = text;
+        if(qFrameCollection.isNorm(innerHTMLText)){
+            for(let el of this.original){
+                el.outerHTML = outerHTMLText;
+            }
+            return this;
         }
-        return this;
+        return this[0].outerHTML;
     }
     html(innerHTMLText){
-        for(let el of this.original){
-            el.innerHTML = text;
+        if(qFrameCollection.isNorm(innerHTMLText)){
+            for(let el of this.original){
+                el.innerHTML = innerHTMLText;
+            }
+            return this;
         }
-        return this;
+        return this[0].innerHTML;
     }
     text(text){
-        if(text !== undefined && text !== null){
+        if(qFrameCollection.isNorm(text)){
             for(let el of this.original){
                 el.textContent = text;
             }
@@ -115,6 +121,7 @@ class qFrameCollection {
         for(let el of this.original){
             el.value = value;
         }
+        return this;
     }
     empty(){
         for(let el of this.original){
@@ -160,10 +167,7 @@ class qFrameCollection {
         }
 
         return localData;
-
-
     }
-
 
 
     on(type, listener, options){
