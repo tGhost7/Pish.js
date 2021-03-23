@@ -16,8 +16,6 @@ class qFrameCollection {
 
     }
 
-    static HIDESHOW = Symbol("HIDESHOW");
-
     static isNorm(something){
         return something !== null && something !== undefined;
     }
@@ -115,7 +113,7 @@ class qFrameCollection {
         return this[0].textContent;
     }
     val(value){
-        if(qFrameCollection.isNorm(value))
+        if(!qFrameCollection.isNorm(value))
             return this[0].value;
 
         for(let el of this.original){
@@ -214,10 +212,10 @@ class qFrameCollection {
 
 
     next(){
-        return this.nextElementSibling;
+        return this[0].nextElementSibling;
     }
     prev(){
-        return this.previousElementSibling;
+        return this[0].previousElementSibling;
     }
     last(){
         return new qFrameCollection(this[this.length - 1]);
@@ -325,6 +323,28 @@ class qFrameCollection {
         return this;
     }
 
+    wrap(elemString){
+        for(let el of this.original){
+            el.insertAdjacentHTML("afterEnd", elemString);
+            el.nextElementSibling.append(el);
+        }
+
+        return this;
+    }
+    unwrap(){
+        for(let el of this.original){
+            let parent = el.parentElement;
+
+            if(parent === document.body || parent === document.head)
+                continue;
+
+            parent.insertAdjacentElement("afterEnd", el);
+            parent.remove();
+        }
+
+        return this;
+    }
+
 
     appendTo(element){
         let normalElem = qFrameCollection.toNormalElem(element);
@@ -345,6 +365,75 @@ class qFrameCollection {
     }
 
 
+
+    serialize() {
+        if (this[0].tagName === "FORM") {
+            let result = "";
+            for (let i = 0; i < this[0].children.length; i++) {
+                let e = this[0].children[i];
+                if (e.name !== undefined && e.name.trim() !== "" && e.name !== null) {
+                    if (i === 0) {
+                        result += e.name + "=" + q(e).val();
+                    } else {
+                        result += "&" + e.name + "=" + q(e).val();
+                    }
+                }
+            }
+            return encodeURI(result);
+        }
+    }
+    serializeJSON() {
+        function __splitInputNameIntoKeysArray(elem) {
+            if (elem[0].name) {
+                let b = elem[0].name;
+                let res = {};
+                let x = b.split('[').join(']').split(']').filter(x => x.trim() !== '');
+                x.reverse().forEach((d, i) => {
+                    if (i == 0) {
+                        res = { [d]: elem[0].value }
+                    } else {
+                        res = { [d]: res }
+                    }
+                });
+                return res;
+            }
+        }
+        function mergeDeep(target, ...sources) {
+            if (!sources.length) return target;
+            const source = sources.shift();
+            if (isObject(target) && isObject(source)) {
+                for (const key in source) {
+                    if (isObject(source[key])) {
+                        if (!target[key]) Object.assign(target, { [key]: {} });
+                        mergeDeep(target[key], source[key]);
+                    } else {
+                        Object.assign(target, { [key]: source[key] });
+                    }
+                }
+            }
+        }
+        function isObject(item) {
+            return (item && typeof item === 'object' && !Array.isArray(item));
+        }
+        let result = {};
+        if (this[0].tagName === 'FORM') {
+            for (let i = 0; i < this[0].children.length; i++) {
+                let e = this[0].children[i];
+                mergeDeep(result, __splitInputNameIntoKeysArray(q(e)));
+            }
+            return result;
+        }
+    }
+
+    index() {
+        let i = 0;
+        for (let el of [...this[0].parentElement.children]) {
+            if (this[0] === el) {
+                return i;
+            }
+            i++;
+        }
+    }
 }
 export {
     qFrameCollection
